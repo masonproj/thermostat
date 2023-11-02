@@ -1,21 +1,28 @@
 #include <Arduino.h>
+#include <IRremoteESP8266.h>
+#include <IRrecv.h>
+#include <IRutils.h>
 
-// put function declarations here:
-int myFunction(int, int);
-int result;
+const int RECV_PIN = 23;  // Define the digital pin to which the IR receiver is connected
 
-void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(9600);
-  result = myFunction(2, 3);
+IRrecv irrecv(RECV_PIN);  // Create an instance of the IRrecv library
+
+decode_results results;  // Create a variable to store the received IR data
+
+void setup()
+{
+  Serial.begin(115200);   // Initialize the serial communication
+  irrecv.enableIRIn();  // Start the IR receiver
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
-  Serial.println(result);
-}
+void loop()
+{
+  if (irrecv.decode(&results))
+  {
+    // Print the received IR code to the Serial Monitor
+    Serial.print("Received IR Code: 0x");
+    Serial.println(results.value, HEX);
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+    irrecv.resume();  // Continue to receive IR data
+  }
 }
